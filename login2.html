@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+  <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+  <!-- <link rel="stylesheet" href="https://m.w3newbie.com/you-tube.css"> -->
+  
+  <script>
+    var username;
+        $(document).ready(function () {
+        $("form").submit(function (e) {
+        // prevent form to submit immediately, otherwise the code after this line will be bypassed
+        e.preventDefault();
+        //get inputs
+        const user = $("#txtUsername").val();
+        const pass = $("#txtPassword").val();
+        if (pass.length == 0 || user.length == 0){
+          $("#alertnone").show().fadeOut(4000);
+        }else{
+        //verify
+        $.ajax({
+        
+            method: "POST",
+            url: "/login3",
+            data: { username: user, password: pass }
+            }).done(function (data, state, xhr) {
+                // correct login
+                if(data.includes("fail")){
+                    $("#alertwrong").show().fadeOut(4000);
+                
+                }
+                else
+                window.location.replace(data);
+              
+                
+            // alert(data)
+            }).fail(function (xhr, state) {
+            //wrong login
+             $("#alertwrong").show().fadeOut(4000);
+            });
+          }
+            });
+        });
+  </script>
+</head>
+<style>
+  body{
+    font-family: 'Roboto', sans-serif;
+    background: url(img/mountain.jpg) no-repeat center center fixed;
+    background-size: cover;
+}
+.main-section {
+    margin: 0 auto;
+    margin-top: 130px;
+    padding: 0;
+}
+.modal-content{
+    background-color: #3b4652;
+    opacity: .95;
+    padding: 0 18px;
+    box-shadow: 0px 0px 3px #848484;
+}
+.user-img{
+    margin-top: -50px;
+    margin-bottom: 35px;
+}
+.user-img img{
+ height: 100px;
+ width: 100px;
+ border-radius: 5px;
+ box-shadow: 0px 0px 2px #848484;
+}
+.form-group{
+    margin-bottom: 25px;
+}
+.form-group input{
+    height: 42px;
+    border-radius: 5px;
+    border: 0;
+    font-size: 18px;
+    padding-left: 54px ;
+}
+.form-group::before {
+    font-family: 'Font Awesome\ 5 Free';
+    content: "\f007";
+    position: absolute;
+    font-size: 22px;
+    color: #555e60;
+    left: 28px;
+    padding-top: 4px;
+}
+.form-group:last-of-type::before {
+    content: "\f023";
+} 
+button{
+    width: 40%;
+    margin: 5px 0 25px;
+}
+.btn{
+    background-color: #27c2a5;
+    color: #fff;
+    font-size: 19px;
+    padding: 7px 14px;
+    border-radius: 5px;
+    border-bottom: 4px solid #219882;
+}
+.btn:hover,.btn:focus{
+    background-color: #25a890;
+    border-bottom: 4px solid #25a890!important;
+}
+.svg-inline--fa{
+    font-size: 20px;
+    margin-right: 7px;
+}
+.forgot{
+    padding: 5px 0 25px;
+}
+.forgot a {
+    color: #c2fbfe;
+}
+</style>
+<body>
+<div class="modal-dialog text-center">
+<div class="col-sm-8 main-section">
+  <div class="modal-content">
+    <!-- <div class="col-12 user-img">
+      <img src="img/face.png" alt="">
+    </div> -->
+    <form class="col-12 " style="margin-top:20%;">
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Enter Username" id="txtUsername">
+      </div>
+      <div class="form-group">
+        <input type="password" class="form-control" placeholder="Enter Password" id="txtPassword">
+      </div>
+      <li class="nav-item" style="margin-top:-15%;">
+        <a class="nav-link" href="/">Login as User</a>
+      </li>
+      <li class="nav-item" style="margin-top:-15%;">
+        <a class="nav-link" href="/superadmin">Login as SuperAdmin</a>
+      </li>
+      <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i>Login</button>
+      
+    </form>
+    <div class="alert alert-danger" style="display: none" id="alertwrong">
+      <span>Wrong login</span>
+    </div>
+    <div class="alert alert-danger" style="display: none" id="alertnone">
+      <span>Please enter your username and password</span>
+    </div>
+    <!-- <div class="col-12 forgot"><a href="#">Forgot Password?</a></div> -->
+
+
+  </div>
+</div>
+</div>
+ 

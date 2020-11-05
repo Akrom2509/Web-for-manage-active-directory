@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.3.2/bootbox.min.js"></script>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.3.2/bootbox.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap4.min.js"></script>
+
+    <style>
+        th.dt-center,
+        td.dt-center {
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        var tableUser;
+        var OU;
+
+        $(document).ready(function () {
+            $("#btnSignOut").click(function () {
+                window.location.replace("/")
+
+            });
+
+            var dataSet = [];
+            var num = [];
+            getUser();
+            // prepare DataTable    
+            tableUser = $('#myTable').DataTable({
+                responsive: true,
+                deferRender: true,
+                data: dataSet,
+                columns: [
+
+                    { data: "sAMAccountName", title: "Username", "defaultContent": "<i>Not set</i>" },
+                    { data: "givenName", title: "Name", "defaultContent": "<i>Not set</i>" },
+                    { data: "sn", title: "Surname", "defaultContent": "<i>Not set</i>" },
+                    { data: "mail", title: "Email", "defaultContent": "<i>Not set</i>" },
+                    { title: "Action", orderable: false, defaultContent: "<button class='btn btn-warning btnEdit mr-1'><i class='fa fa-edit'></i>Edit</button><button class='btn btn-danger btnDelete mt-2'><i class='fa fa-trash'></i> </button>" },
+                    { title: "Change Password", orderable: false, defaultContent: "<button class='btn btn-warning btnChangePass mr-1'><i class='fa fa-key icon'></i> Change Password</button>" }
+                ],
+                columnDefs: [
+                    // make the last column align right, also target: "_all"
+                    { "className": "dt-center", "targets": 4 }
+                ]
+            });
+            $("#btnOk").click(function () {
+                let user = $("#txtUsername").val();
+                let pass = $("#txtPassword").val();
+
+                //    alert(pass) ;             
+
+                $.ajax({
+                    method: "POST",
+                    url: "/adduser",
+                    data: {
+                        user: user,
+                        pass: pass
+
+                    }
+                }).done(function (data, state, xhr) {
+
+
+                    getuser();
+                }).fail(function (xhr, state) {
+
+                });
+                $("p").show();
+                $("p").hide(5000);
+                $("#txtUsername").val("").focus();
+                $("#txtPassword").val("");
+
+
+            });
+        });
+        // update
+        function updateUser(userName) {
+         
+
+            $("#btnOkEdit").click(function () {
+
+                
+                let name = $("#txtnameEdit").val();
+                let surname = $("#txtsurnameEdit").val();
+                let mail = $("#txtmailEdit").val();
+
+
+
+                $.ajax({
+                    method: "PUT",
+                    url: "./user/update/" + userName,
+                    data: {
+                    
+                        name: name,
+                        surname: surname,
+                        mail: mail,
+                        OU: OU
+
+
+                    }
+                }).done(function (data, state, xhr) {
+
+                    getUser();
+                }).fail(function (xhr, state) {
+                    alert("Error");
+                });
+                //  $.ajax({
+                //      method: "PUT",
+                //      url: "./user/update2/" + userName,
+                //      data: {
+                //          username: user,
+                //          name: name,
+                //          surname: surname,
+                //          mail: mail,
+                //          school: school
+
+
+                //      }
+                //  })
+                window.location.replace("")
+            });
+        }
+
+        function getUser() {
+            $.ajax({
+                method: "put",
+                url: "/test2"
+            }).done(function (data, state, xhr) {
+                OU = data;
+
+            });
+            //get users from DB
+            $.ajax({
+                method: "put",
+                url: "/adminuser"
+            }).done(function (dataSet, state, xhr) {
+                //To show DB recordset in DataTable, DB field must matches with DataTable's columns.data
+                //modify retrieved JSON data only for some fields    
+                // for (let i = 0; i < dataSet.data.length; i++) {
+                //    num = i + 1;
+                //  }
+
+                //clear DataTable
+                tableUser.clear();
+                //display modified JSON in DataTable
+                tableUser.rows.add(dataSet.data).draw();
+
+                $('#myTable tbody').on('click', '.btnDelete', function () {
+                    //get selected row
+                    const currentRow = $(this).parents('tr');
+                    const selectedData = tableUser.row(currentRow).data();
+                    //get a column of selected row
+                    // alert(selectedData.cn);
+
+                    //show confirm dialog
+                    bootbox.confirm("Delete " + selectedData.cn + "?", function (result) {
+                        if (result == true) {
+                            let userID=selectedData.cn;
+
+                            deleteUser(userID,OU);
+                        }
+                        window.location.replace("")
+                    });
+                });
+                $('#myTable tbody').on('click', '.btnEdit', function () {
+                    let selectedData = tableUser.row($(this).parents('tr')).data();
+                 $("#txtUsernameEdit").val(selectedData.sAMAccountName);
+                    updateUser(selectedData.cn);
+                    $("#editUserModal").modal("toggle");
+                    // $("#txtId").val(selectedData.uid);
+                });
+                $('#myTable tbody').on('click', '.btnChangePass', function () {
+                    let selectedData = tableUser.row($(this).parents('tr')).data();
+                    changepassword(selectedData.sAMAccountName);
+                    $("#editPassword").modal("toggle");
+
+
+                    // $("#txtId").val(selectedData.uid);
+                });
+
+
+            }).fail(function (xhr, state, error) {
+                //get data failed
+                alert(xhr.responseText);
+            });
+        }
+
+        function deleteUser(userID, OU) {
+            let test = OU;
+            $.ajax({
+                method: "DELETE",
+                url: "/user2/" + userID,
+                data: { test: test }
+            }).done(function (data, state, xhr) {
+                getUser();
+            }).fail(function (xhr, state) {
+                alert("Sorry, please check your connection");
+            });
+        }
+        
+        function changepassword(userNameChange) {
+            
+            $("#txtUsernameChange").val(userNameChange);
+
+            $("#btnOkEdit2").click(function () {
+
+                let username = $("#txtUsernameChange").val();
+                let newpass = $("#txtPasswordChange").val();
+                $.ajax({
+                    method: "put",
+                    url: "/change",
+                    data: {
+                        username: username,
+                        newpass: newpass
+                    }
+                }).done(function (data, state, xhr) {
+
+
+                }).fail(function (xhr, state) {
+
+                });
+
+
+                window.location.replace("")
+            });
+        }
+    </script>
+</head>
+
+<body style="background-color: #e9e9e6">
+    <div class="jumbotron jumbotron-fluid" style="margin-bottom:0; background-color:rgb(255, 255, 255)">
+        <div class="container">
+            <h2 class="container">
+                <img src="img/ITMFU.png" alt="Welcome">
+
+
+                <!-- </h2>
+            <h2 class="display-4 text-black" >Welcome Admin</h2>
+            <h4 class="text-black">Test</h4>  -->
+                <!-- <h4 class="text-black">Welcome to</h4> -->
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-sm navbar-dark" style="background-color: #253B6E">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavId">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavId">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link menu-title" href="Home"><i class="fa fa-home"> Home</i><span
+                            class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item" id="btnAdd">
+                    <a class="nav-link menu-title" href="addpagestaff">Add User</a>
+                </li>
+                <li class="nav-item" id="btnSignOut">
+                    <a class="nav-link menu-title" href="/">Sign Out</a>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container my-4 ml-4">
+
+
+
+        <!-- <div style="margin-bottom: 4em">
+            <button class="btn btn-dark float-left" id="btnSignOut">Sign Out</button>
+            <button class="btn btn-success float-right" id="btnAdd">Add User</button>
+        </div> -->
+
+        <table id="myTable" class="table table-striped table-bordered" style="width:110%">
+            <thead class="thead-dark"></thead>
+        </table>
+
+    </div>
+   
+    <!-- edit user -->
+    <div class="modal fade" id="editUserModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update user</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" name="" id="txtUsernameEdit" class="form-control mb-2"
+                        placeholder="Input New username" readonly>
+                    <input type="text" name="" id="txtnameEdit" class="form-control mb-2" placeholder="Input New name">
+                    <input type="text" name="" id="txtsurnameEdit" class="form-control mb-2"
+                        placeholder="Input New surname">
+                    <input type="text" name="" id="txtmailEdit" class="form-control mb-2" placeholder="Input New Email">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" id="btnOkEdit">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+   <!-- ////CHANGE PASSSOWRD -->
+   <div class="modal fade" id="editPassword">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="text" name="" id="txtUsernameChange" class="form-control mb-2" 
+                    readonly>
+                <input type="text" name="" id="txtPasswordChange" class="form-control mb-2"
+                    placeholder="Input New Password">
+
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" data-dismiss="modal" id="btnOkEdit2">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
